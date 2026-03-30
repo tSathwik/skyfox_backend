@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:15
+    container_name: booking-db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: bookings
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bookingdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookings -d bookingdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    container_name: skyfox-backend
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy 
+
+volumes:
+  pgdata:

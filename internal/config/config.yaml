@@ -1,0 +1,10 @@
+app:
+  name: skyfox_backend
+  port : 8000
+
+database:
+  host: db
+  user : bookings
+  name : bookingdb
+  password: postgres
+  port : 5432
