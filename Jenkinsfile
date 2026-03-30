@@ -7,6 +7,7 @@ pipeline {
         PORT = '8000'
     }
 
+
     stages {
 
         stage('Checkout SCM') {
@@ -41,13 +42,11 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Deploy') {
             steps {
                 sh '''
-                docker run -d \
-                  --name $CONTAINER_NAME \
-                  -p $PORT:$PORT \
-                  $IMAGE_NAME
+                docker compose down || true
+                docker compose up -d --build
                 '''
             }
         }
