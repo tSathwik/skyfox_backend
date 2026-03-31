@@ -7,6 +7,7 @@ import (
 	"skyfox_backend/internal/user"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 	handler := database.NewDBHandler(cfg)
 
 	database := handler.NewDatabase()
+	logger,_ := zap.NewProduction()
 
 	log.Println("database connected successfully")
 
@@ -25,14 +27,14 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to migrate database:", err)
 	}
-
-	userRepo := user.NewUserRepository(database)
-	userService := user.NewUserService(userRepo)
+	userRepo := user.NewUserRepository(database,logger)
+	userService := user.NewUserService(userRepo,logger)
 	userController := user.NewUserController(userService)
 
 	server := gin.Default()
-	server.POST("/user",userController.CreateUser)
-
+	userGroup :=server.Group("/user")
+	userGroup.POST("/",userController.CreateUser)
+	userGroup.GET("/:id",userController.GetUserById)
 	server.GET("/ping",func (context *gin.Context){
 		context.JSON(200,gin.H{"message":"pong"})
 	})
